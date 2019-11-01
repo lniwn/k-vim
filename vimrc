@@ -672,8 +672,11 @@ endif
 set background=dark
 set t_Co=256
 
-colorscheme solarized
-" colorscheme molokai
+if filereadable(expand("~/.vimrc.bundles")) 
+  || filereadable(expand("~/.config/nvim/vimrc.bundles"))
+" colorscheme solarized
+colorscheme molokai
+endif
 
 
 " 设置标记一列的背景颜色和数字一行颜色一致
