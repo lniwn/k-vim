@@ -141,6 +141,9 @@ set whichwrap+=<,>,h,l
 " operation, see https://goo.gl/YAHBbJ
 set clipboard+=unnamedplus
 
+" 禁用 Vi 兼容模式
+set nocompatible
+
 "==========================================
 " Display Settings 展示/排版等界面格式设置
 "==========================================
@@ -672,10 +675,9 @@ endif
 set background=dark
 set t_Co=256
 
-if filereadable(expand("~/.vimrc.bundles")) 
-  || filereadable(expand("~/.config/nvim/vimrc.bundles"))
-" colorscheme solarized
-colorscheme molokai
+if filereadable(expand("~/.vimrc.bundles")) || filereadable(expand("~/.config/nvim/vimrc.bundles"))
+  " colorscheme solarized
+  colorscheme molokai
 endif
 
 
