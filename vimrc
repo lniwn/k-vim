@@ -103,11 +103,16 @@ set t_ti= t_te=
 
 
 " 鼠标暂不启用, 键盘党....
-set mouse-=a
+" set mouse-=a
 " 启用鼠标
 " set mouse=a
 " Hide the mouse cursor while typing
 " set mousehide
+" Use mouse to select and resize windows, etc.
+if has('mouse')
+    set mouse=nv  " Enable mouse in several mode
+    set mousemodel=popup  " Set the behaviour of mouse
+endif
 
 
 " 修复ctrl+m 多光标操作选择的bug，但是改变了ctrl+v进行字符选中时将包含光标下的字符
@@ -131,6 +136,10 @@ set magic
 " Configure backspace so it acts as it should act
 set backspace=eol,start,indent
 set whichwrap+=<,>,h,l
+
+" Clipboard settings, always use clipboard for all delete, yank, change, put
+" operation, see https://goo.gl/YAHBbJ
+set clipboard+=unnamedplus
 
 "==========================================
 " Display Settings 展示/排版等界面格式设置
@@ -385,10 +394,16 @@ inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
 
 
 " 分屏窗口移动, Smart way to move between windows
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <C-h> <C-W>h
-map <C-l> <C-W>l
+nnoremap <C-j> <C-W>j
+nnoremap <C-k> <C-W>k
+nnoremap <C-h> <C-W>h
+nnoremap <C-l> <C-W>l
+
+" 插入模式移动光标 ctrl + 方向键
+inoremap <C-j> <Down>
+inoremap <C-k> <Up>
+inoremap <C-h> <left>
+inoremap <C-l> <Right>
 
 
 " http://stackoverflow.com/questions/13194428/is-better-way-to-zoom-windows-in-vim-than-zoomwin
