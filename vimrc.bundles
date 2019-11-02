@@ -743,7 +743,7 @@ endif
     let g:NERDTreeMapOpenSplit = 's'
     let g:NERDTreeMapOpenVSplit = 'v'
     " fix Nerdtree ^G before folder and file names OSX terminal vim
-    let g:NERDTreeNodeDelimiter = "\u00a0"
+    let g:NERDTreeNodeDelimiter = "\x07"
 
 
     " nerdtreetabs
