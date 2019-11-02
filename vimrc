@@ -1,11 +1,8 @@
 "==========================================
-" Author:  wklken
-" Version: 9.1
-" Email: wklken@yeah.net
-" BlogPost: http://www.wklken.me
-" ReadMe: README.md
-" Donation: http://www.wklken.me/pages/donation.html
-" Last_modify: 2015-12-15
+" Author:  lniwn
+" Version: 1.0
+" Email: lniwn@live.com
+" Github: https://github.com/lniwn/k-vim
 " Sections:
 "       -> Initial Plugin 加载插件
 "       -> General Settings 基础设置
@@ -24,6 +21,71 @@
 " Initial Plugin 加载插件
 "==========================================
 
+" 判断操作系统是否是 Windows 还是 Linux
+let g:iswindows = 0
+let g:islinux = 0
+if(has("win32") || has("win64") || has("win95") || has("win16"))
+    let g:iswindows = 1
+else
+    let g:islinux = 1
+endif
+
+" 判断是终端还是 Gvim
+if has("gui_running")
+    let g:isGUI = 1
+else
+    let g:isGUI = 0
+endif
+
+" 加载默认配置
+if (g:iswindows && g:isGUI)
+    source $VIMRUNTIME/vimrc_example.vim
+    source $VIMRUNTIME/mswin.vim
+    behave mswin
+    set diffexpr=MyDiff()
+
+    function MyDiff()
+        let opt = '-a --binary '
+        if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+        if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+        let arg1 = v:fname_in
+        if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+        let arg2 = v:fname_new
+        if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+        let arg3 = v:fname_out
+        if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+        let eq = ''
+        if $VIMRUNTIME =~ ' '
+            if &sh =~ '\<cmd'
+                let cmd = '""' . $VIMRUNTIME . '\diff"'
+                let eq = '"'
+            else
+                let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+            endif
+        else
+            let cmd = $VIMRUNTIME . '\diff'
+        endif
+        silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
+    endfunction
+endif
+if g:islinux
+    if g:isGUI
+        " Source a global configuration file if available
+        if filereadable("/etc/vim/gvimrc.local")
+            source /etc/vim/gvimrc.local
+        endif
+    else
+        " This line should not be removed as it ensures that various options are
+        " properly set to work with the Vim-related packages available in Debian.
+        runtime! debian.vim
+
+        " Source a global configuration file if available
+        if filereadable("/etc/vim/vimrc.local")
+            source /etc/vim/vimrc.local
+        endif
+    endif
+endif
+
 " 修改leader键
 let mapleader = ','
 let g:mapleader = ','
@@ -31,11 +93,17 @@ let g:mapleader = ','
 " 开启语法高亮
 syntax on
 
-" install bundles
-if filereadable(expand("~/.vimrc.bundles"))
-  source ~/.vimrc.bundles
-elseif filereadable(expand("~/.config/nvim/vimrc.bundles")) " neovim
-  source ~/.config/nvim/vimrc.bundles
+if g:islinux
+  " install bundles
+  if filereadable(expand('~/.vimrc.bundles'))
+    source ~/.vimrc.bundles
+  elseif filereadable(expand('~/.config/nvim/vimrc.bundles')) " neovim
+    source ~/.config/nvim/vimrc.bundles
+  endif
+else
+  if filereadable(expand('$VIM/.vimrc.bundles'))
+    source $VIM/.vimrc.bundles
+  endif
 endif
 
 " ensure ftdetect et al work by including this after the bundle stuff
@@ -175,6 +243,13 @@ set showmatch
 " How many tenths of a second to blink when matching brackets
 set matchtime=2
 
+" 设置 gVim 窗口初始位置及大小
+if g:isGUI
+    " au GUIEnter * simalt ~x                           "窗口启动时自动最大化
+    winpos 100 10                                     "指定窗口出现的位置，坐标原点在屏幕左上角
+    set lines=38 columns=120                          "指定窗口大小，lines为高度，columns为宽度
+endif
+
 
 " 设置文内智能搜索提示
 " 高亮search命中的文本
@@ -272,7 +347,7 @@ set encoding=utf-8
 " 自动判断编码时，依次尝试以下编码：
 set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
 set helplang=cn
-"set langmenu=zh_CN.UTF-8
+set langmenu=zh_CN.UTF-8
 "set enc=2byte-gb18030
 " 下面这句只影响普通模式 (非图形界面) 下的 Vim
 set termencoding=utf-8
@@ -285,14 +360,27 @@ set formatoptions+=m
 " 合并两行中文时，不在中间加空格
 set formatoptions+=B
 
+if (g:iswindows && g:isGUI)
+    " 解决菜单乱码
+    source $VIMRUNTIME/delmenu.vim
+    source $VIMRUNTIME/menu.vim
+
+    " 解决consle输出乱码
+    language messages zh_CN.utf-8
+endif
+
 
 "==========================================
 " others 其它设置
 "==========================================
-" vimrc文件修改之后自动加载, windows
-autocmd! bufwritepost _vimrc source %
-" vimrc文件修改之后自动加载, linux
-autocmd! bufwritepost .vimrc source %
+
+if g:iswindows
+  " vimrc文件修改之后自动加载, windows
+  autocmd! bufwritepost _vimrc source %
+else
+  " vimrc文件修改之后自动加载, linux
+  autocmd! bufwritepost .vimrc source %
+endif
 
 " 自动补全配置
 " 让Vim的补全菜单行为与一般IDE一致(参考VimTip1228)
@@ -308,6 +396,12 @@ autocmd InsertLeave * if pumvisible() == 0|pclose|endif
 
 " 回车即选中当前项
 inoremap <expr> <CR>       pumvisible() ? "\<C-y>" : "\<CR>"
+
+" 常规模式下输入 cS 清除行尾空格
+nmap cS :%s/\s\+$//g<CR>:noh<CR>
+
+" 常规模式下输入 cM 清除行尾 ^M 符号
+nmap cM :%s/\r$//g<CR>:noh<CR>
 
 " In the quickfix window, <CR> is used to jump to the error under the
 " cursor, so undefine the mapping there.
@@ -606,6 +700,8 @@ autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript tabstop=2
 " disable showmatch when use > in php
 au BufWinEnter *.php set mps-=<:>
 
+" 启用每行超过80列的字符提示（字体变蓝并加下划线），不启用就注释掉
+au BufWinEnter * let w:m2=matchadd('Underlined', '\%>' . 120 . 'v.\+', -1)
 
 
 " 保存python文件时删除多余空格
@@ -662,21 +758,38 @@ set lazyredraw          " redraw only when we need to.
 "==========================================
 
 " Set extra options when running in GUI mode
-if has("gui_running")
+" 显示/隐藏菜单栏、工具栏、滚动条，可用 Ctrl + F11 切换
+if g:isGUI
+  if g:iswindows
+    set guifont=Fira\ Code:h14:cANSI
+    set guifontwide=YaHei\ Consolas\ Hybrid:h14:cGB2312
+  elseif has("gui_gtk2")   "GTK2
+    set guifont=Monaco\ 12,Monospace\ 12
+  else
     set guifont=Monaco:h14
-    if has("gui_gtk2")   "GTK2
-        set guifont=Monaco\ 12,Monospace\ 12
-    endif
-    set guioptions-=T
-    set guioptions+=e
-    set guioptions-=r
-    set guioptions-=L
-    set guitablabel=%M\ %t
-    set showtabline=1
-    set linespace=2
-    set noimd
-    set t_Co=256
-    set winaltkeys=no
+  endif
+  
+  set guitablabel=%M\ %t
+  set showtabline=1
+  set linespace=2
+  set noimd
+  set t_Co=256
+  set winaltkeys=no
+  set guioptions-=m
+  set guioptions-=T
+  set guioptions-=r
+  set guioptions-=L
+  map <silent> <c-F11> :if &guioptions =~# 'm' <Bar>
+      \set guioptions-=m <Bar>
+      \set guioptions-=T <Bar>
+      \set guioptions-=r <Bar>
+      \set guioptions-=L <Bar>
+  \else <Bar>
+      \set guioptions+=m <Bar>
+      \set guioptions+=T <Bar>
+      \set guioptions+=r <Bar>
+      \set guioptions+=L <Bar>
+  \endif<CR>
 endif
 
 
@@ -685,9 +798,15 @@ endif
 set background=dark
 set t_Co=256
 
-if filereadable(expand("~/.vimrc.bundles")) || filereadable(expand("~/.config/nvim/vimrc.bundles"))
-  " colorscheme solarized
-  colorscheme molokai
+if g:islinux
+  if filereadable(expand("~/.vimrc.bundles")) || filereadable(expand("~/.config/nvim/vimrc.bundles"))
+    " colorscheme solarized
+    colorscheme molokai
+  endif
+else
+  if filereadable(expand('$VIM/.vimrc.bundles'))
+    colorscheme molokai
+  endif
 endif
 
 
