@@ -471,33 +471,30 @@ endif
 
 " ultisnips {{{
     let g:UltiSnipsExpandTrigger       = "<tab>"
-    let g:UltiSnipsJumpForwardTrigger  = "<tab>"
-    let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+    "let g:UltiSnipsJumpForwardTrigger  = "<tab>"
+    "let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
     let g:UltiSnipsSnippetDirectories  = ['UltiSnips']
-    let g:UltiSnipsSnippetsDir = '~/.vim/UltiSnips'
-    " 定义存放代码片段的文件夹 .vim/UltiSnips下，使用自定义和默认的，将会的到全局，有冲突的会提示
+    if g:islinux
+        let g:UltiSnipsSnippetsDir = '~/.vim/UltiSnips'
+    else
+        let g:UltiSnipsSnippetsDir = '$VIM/UltiSnips'
+    endif
+    " 定义存放代码片段的文件夹 .vim/UltiSnips下，使用自定义和默认的，将会映射到全局，有冲突的会提示
     " 进入对应filetype的snippets进行编辑
     map <leader>us :UltiSnipsEdit<CR>
 
-    " ctrl+j/k 进行选择
-    func! g:JInYCM()
-        if pumvisible()
-            return "\<C-n>"
+    " https://github.com/ycm-core/YouCompleteMe/issues/420#issuecomment-55940039
+    " let g:UltiSnipsExpandTrigger = "<nop>"
+    let g:ulti_expand_or_jump_res = 0
+    function ExpandSnippetOrCarriageReturn()
+        let snippet = UltiSnips#ExpandSnippetOrJump()
+        if g:ulti_expand_or_jump_res > 0
+            return snippet
         else
-            return "\<c-j>"
+            return "\<CR>"
         endif
     endfunction
-
-    func! g:KInYCM()
-        if pumvisible()
-            return "\<C-p>"
-        else
-            return "\<c-k>"
-        endif
-    endfunction
-    inoremap <c-j> <c-r>=g:JInYCM()<cr>
-    au BufEnter,BufRead * exec "inoremap <silent> " . g:UltiSnipsJumpBackwordTrigger . " <C-R>=g:KInYCM()<cr>"
-    let g:UltiSnipsJumpBackwordTrigger = "<c-k>"
+    inoremap <expr> <CR> pumvisible() ? "<C-R>=ExpandSnippetOrCarriageReturn()<CR>" : "\<CR>"
 " }}}
 
 
@@ -753,6 +750,8 @@ endif
     let NERDTreeAutoDeleteBuffer = 1
     " automatically close NerdTree when you open a file
     let NERDTreeQuitOnOpen = 1
+    " 不显示顶部的帮助信息
+    let NERDTreeMinimalUI = 1
 
     " 如果不带参数启动vim，则自动打开nerdtree
     autocmd StdinReadPre * let s:std_in=1

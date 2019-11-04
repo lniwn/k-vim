@@ -761,14 +761,13 @@ set lazyredraw          " redraw only when we need to.
 " 显示/隐藏菜单栏、工具栏、滚动条，可用 Ctrl + F11 切换
 if g:isGUI
   if g:iswindows
-    set guifont=Fira\ Code:h14:cANSI
     set guifontwide=YaHei\ Consolas\ Hybrid:h14:cGB2312
-  elseif has("gui_gtk2")   "GTK2
-    set guifont=Monaco\ 12,Monospace\ 12
-  else
-    set guifont=Monaco:h14
+  "elseif has("gui_gtk2")   "GTK2
+  "  set guifont=Monaco\ 12,Monospace\ 12
+  "else
+  "  set guifont=Monaco:h14
   endif
-  
+  set guifont=Fira\ Code:h14:cANSI
   set guitablabel=%M\ %t
   set showtabline=1
   set linespace=2
