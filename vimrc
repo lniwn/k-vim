@@ -207,7 +207,7 @@ set whichwrap+=<,>,h,l
 
 " Clipboard settings, always use clipboard for all delete, yank, change, put
 " operation, see https://goo.gl/YAHBbJ
-set clipboard+=unnamedplus
+set clipboard^=unnamedplus,unnamed
 
 " 禁用 Vi 兼容模式
 set nocompatible
