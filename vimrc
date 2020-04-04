@@ -652,8 +652,8 @@ nnoremap vv ^vg_
 " w!! to sudo & write a file
 cmap w!! w !sudo tee >/dev/null %
 
-" kj 替换 Esc
-" inoremap kj <Esc>
+" jk 替换 Esc
+inoremap jk <Esc>
 
 " 滚动Speed up scrolling of the viewport slightly
 nnoremap <C-e> 2<C-e>
