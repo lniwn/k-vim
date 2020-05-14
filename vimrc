@@ -502,6 +502,12 @@ inoremap <C-k> <Up>
 inoremap <C-h> <left>
 inoremap <C-l> <Right>
 
+" 移动行
+nnoremap <S-Up> :m-2<CR>
+nnoremap <S-Down> :m+<CR>
+inoremap <S-Up> <Esc>:m-2<CR>
+inoremap <S-Down> <Esc>:m+<CR>
+
 " 插入模式粘贴
 " + for the clipboard,
 " * for the X clipboard (last selected text in X),
